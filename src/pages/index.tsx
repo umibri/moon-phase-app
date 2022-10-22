@@ -1,11 +1,17 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
+import Header from '@components/Header'
+import Moon from '@components/Moon'
+
+
 
 const Home: NextPage = () => {
   return (
-    <div className="w-screen h-screen flex flex-col justify-center items-center bg-zinc-900">
-      <h1 className="text-white text-3xl">Test</h1>
+    <div className="bg-zinc-900">
+      <Header />
+      
+      <div className="w-screen h-screen flex flex-col justify-center items-center">
+        <Moon />
+      </div>
     </div>
   )
 }

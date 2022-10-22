@@ -20,8 +20,15 @@
       "@components/*": ["src/components/*"],
       "@pages/*": ["src/pages/*"],
       "@api/*": ["src/pages/api/*"],
+      "@lib/*": ["src/lib/*"],
     }
   },
-  "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx"],
+  "include": [
+    "next-env.d.ts", 
+    "src/components/**/*.ts", 
+    "src/components/**/*.tsx",
+    "src/pages/**/*.ts", 
+    "src/pages/**/*.tsx"
+  ],
   "exclude": ["node_modules"]
 }
