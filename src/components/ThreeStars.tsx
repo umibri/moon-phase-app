@@ -1,40 +1,29 @@
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import React, { useRef, useState } from 'react';
 import { OrbitControlsWrapper } from '@components/OrbitControlsWrapper'
 import { Bounds, Stars, Plane } from '@react-three/drei'
+import Moon3D from '@components/Moon3D'
 
 
 
 export default function ThreeStars() {
-  const ref = useRef<HTMLDivElement>(null);
-  let HEIGHT = window.innerHeight;
-  let WIDTH = window.innerWidth;
-  let aspectRatio = WIDTH / HEIGHT;
-  let fieldOfView = 75;
-  let nearPlane = 1;
-  let farPlane = 1000;
-  let windowHalfX = WIDTH / 2;
-  let windowHalfY = HEIGHT / 2;
-  let positionZ = farPlane / 2;
-  const [mouseX, setMouseX] = useState(0);
-  const [mouseY, setMouseY] = useState(0);
-
-  function handleOnPointerMove(event: React.MouseEvent) {
-    setMouseX(event.clientX - windowHalfX);
-    setMouseY(event.clientY - windowHalfY);
-    console.log(mouseX,mouseY);
-  }
+  const HEIGHT = window.innerHeight;
+  const WIDTH = window.innerWidth;
+  const fieldOfView = 75;
+  const nearPlane = 1;
+  const farPlane = 1000;
+  const positionZ = farPlane / 2;
+  
 
   return (
-    <div className="w-screen h-screen" ref={ref}>
+    <div className="w-screen h-screen">
       <Canvas
         shadows={true}
-        camera={{ fov: fieldOfView, near: nearPlane, far: farPlane, position: [0, 0, positionZ] }}
+        camera={{ fov: fieldOfView, near: nearPlane, far: farPlane, position: [180, 0, 0] }}
         onCreated={state => {
           state.gl.setClearColor(0x00011, 1);
           state.gl.setPixelRatio(window.devicePixelRatio);
           state.gl.setSize(WIDTH, HEIGHT);
-          state.events.connect!(ref.current)
         }}
         dpr={window.devicePixelRatio}
       >
@@ -51,11 +40,8 @@ export default function ThreeStars() {
         
 
         {/* Main Element */}
-        <Bounds fit observe damping={6} margin={2.5}>
-          <mesh>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color="hotpink"/>
-          </mesh>
+        <Bounds fit observe damping={6} margin={1.5}>
+          <Moon3D />
         </Bounds>
       </Canvas>
     </div>

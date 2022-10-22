@@ -74,8 +74,8 @@ export default function Moon() {
 
 
 
-  function displayPhase() {
-    const day = displayDate - AC.epoch;
+  function displayPhase(jd: number) {
+    const day = jd - AC.epoch;
     const N = fixangle((360 / 365.2422) * day);
     const M = fixangle(N + AC.ecliptic_longitude_epoch - AC.ecliptic_longitude_perigee);
 
@@ -120,7 +120,14 @@ export default function Moon() {
     setTextRes(res);
   }
 
+  const [startDate, setStartDate] = useState('');
 
+  function handleClicks() {
+    if (startDate === '') { return; }
+
+    const newDate = new Date(startDate + 'T00:00Z');
+    displayPhase(getJD(newDate));
+  }
 
   function printString(res: number) {
     let returnStr = '';
@@ -146,7 +153,12 @@ export default function Moon() {
         <div className="text-center">Todays Date: {getDate()}</div>
 
         <div className="text-center my-4">
-        <button className="py-2 px-4 bg-slate-500" onClick={displayPhase}>Phase</button>
+        <button className="py-2 px-4 bg-slate-500" onClick={() => displayPhase(displayDate)}>Phase</button>
+        </div>
+
+        <div>
+          <input type="date" onChange={(event) => setStartDate(event.target.value)}/>
+          <button onClick={() => handleClicks}>Click me with date</button>
         </div>
         
 
