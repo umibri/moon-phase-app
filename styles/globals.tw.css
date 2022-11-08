@@ -510,44 +510,6 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
-.container {
-  width: 100%;
-}
-
-@media (min-width: 640px) {
-  .container {
-    max-width: 640px;
-  }
-}
-
-@media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1024px;
-  }
-}
-
-@media (min-width: 1280px) {
-  .container {
-    max-width: 1280px;
-  }
-}
-
-@media (min-width: 1536px) {
-  .container {
-    max-width: 1536px;
-  }
-}
-
-.absolute {
-  position: absolute;
-}
-
 .sticky {
   position: sticky;
 }
@@ -556,37 +518,50 @@ video {
   top: 0px;
 }
 
+.z-50 {
+  z-index: 50;
+}
+
+.my-16 {
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+}
+
 .my-4 {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
 }
 
 .flex {
   display: flex;
 }
 
-.hidden {
-  display: none;
+.grid {
+  display: grid;
 }
 
-.h-screen {
-  height: 100vh;
+.h-1\/4 {
+  height: 25%;
 }
 
-.h-1\/2 {
-  height: 50%;
+.h-2\/5 {
+  height: 40%;
 }
 
-.w-screen {
-  width: 100vw;
+.w-\[90\%\] {
+  width: 90%;
 }
 
-.w-1\/2 {
-  width: 50%;
-}
-
-.resize {
-  resize: both;
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .flex-col {
@@ -601,13 +576,18 @@ video {
   justify-content: center;
 }
 
+.gap-4 {
+  gap: 1rem;
+}
+
 .bg-zinc-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(24 24 27 / var(--tw-bg-opacity));
 }
 
-.bg-white\/5 {
-  background-color: rgb(255 255 255 / 0.05);
+.bg-zinc-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(39 39 42 / var(--tw-bg-opacity));
 }
 
 .bg-slate-500 {
@@ -618,11 +598,6 @@ video {
 .bg-slate-400 {
   --tw-bg-opacity: 1;
   background-color: rgb(148 163 184 / var(--tw-bg-opacity));
-}
-
-.bg-black {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
 }
 
 .p-4 {
@@ -641,6 +616,11 @@ video {
 
 .text-center {
   text-align: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 html,
@@ -668,5 +648,11 @@ a {
   body {
     color: white;
     background: black;
+  }
+}
+
+@media (min-width: 640px) {
+  .desktop\:w-1\/2 {
+    width: 50%;
   }
 }

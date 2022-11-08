@@ -11,7 +11,7 @@ export default function MoonMain() {
   const PIXELRATIO = window.devicePixelRatio;
 
   return (
-    <div className="min-w-screen min-h-screen">
+    <div className="w-[90%] h-2/5">
       <Canvas camera={{ fov: 75, near: 1, far: 1000, position: [500, 0, -1]}}
         onCreated={state => {
           state.gl.setClearColor(0x00011, 1);

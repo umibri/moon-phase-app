@@ -13,7 +13,7 @@ const Home: NextPage = () => {
       <Header />
       
 
-        <div className="w-screen h-screen flex flex-col justify-center items-center">
+        <div className=" flex flex-col justify-center items-center">
           <MoonScene />
           <MoonCalculator />
         </div>

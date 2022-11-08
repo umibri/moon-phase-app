@@ -1,140 +1,54 @@
-import { useState } from "react";
-import { AstronomicalConstants as AC, PrecisionConstants as PC } from '@lib/constants';
-import { fixangle, torad, todeg, kepler } from '@lib/calculations';
-import { getJD, getDate } from '@lib/api'
+import React, { useState } from "react";
+import { MoonPhases as MP, EmptyMoonData as EMD} from '@lib/constants';
+import { getJD, getDate } from '@lib/utils'
+import { MoonData } from '@lib/types'
 
-interface MoonData {
-  [key: string]: number;
-  phase: number,
-  illuminated: number,
-  age: number,
-  distance: number,
-  angular_diameter: number,
-  sun_distance: number,
-  sun_angular_diameter: number,
-}
-
-interface MoonPhase {
-  [key: string]: string | number;
-  phaseText: string;
-  illuminated: number;
-}
-
-export default function Moon() {
-  const [displayDate, setDisplayDate] = useState(getDate());
+export default function MoonCalculator() {
+  const startDate = getDate();
+  const [displayDate, setDisplayDate] = useState(startDate);
+  const [inputDate, setInputDate] = useState('');
   const [moonPhaseText, setMoonPhaseText] = useState('');
-  const [textRes, setTextRes] = useState<MoonData>({
-    phase: 0,
-    illuminated: 0,
-    age: 0,
-    distance: 0,
-    angular_diameter: 0,
-    sun_distance: 0,
-    sun_angular_diameter: 0,
-  });
+  const [moonData, setMoonData] = useState<MoonData>(EMD);
 
-  const moonPhases: MoonPhase[] = [
-    {
-      phaseText: 'New Moon',
-      illuminated: PC.NEW + PC.PRECISION,
-    },
-    {
-      phaseText: 'Waxing Crescent',
-      illuminated: PC.FIRST - PC.PRECISION,
-    },
-    {
-      phaseText: 'First Quarter',
-      illuminated: PC.FIRST + PC.PRECISION,
-    },
-    {
-      phaseText: 'Waxing Gibbous',
-      illuminated: PC.FULL - PC.PRECISION,
-    },
-    {
-      phaseText: 'Full Moon',
-      illuminated: PC.FULL + PC.PRECISION,
-    },
-    {
-      phaseText: 'Waning Gibbous',
-      illuminated: PC.LAST - PC.PRECISION,
-    },
-    {
-      phaseText: 'Last Quarter',
-      illuminated: PC.LAST + PC.PRECISION,
-    },
-    {
-      phaseText: 'Waning Crescent',
-      illuminated: PC.NEXTNEW - PC.PRECISION,
-    },
-    {
-      phaseText: 'New Moon',
-      illuminated: PC.NEXTNEW + PC.PRECISION,
-    }
-  ];
+  async function handlePhaseChange(event?: React.MouseEvent<HTMLButtonElement>, date?: Date) {
+    event?.preventDefault();
 
+    const jdVal = typeof date === 'undefined' ? getJD(displayDate) : getJD(date);
+    const data = { jd: jdVal };
+    const endpoint = '/api/calculatePhase';
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    };
 
+    const res = await fetch(endpoint, options);
+    const result = await res.json();
 
-  function displayPhase(jd: number) {
-    const day = jd - AC.epoch;
-    const N = fixangle((360 / 365.2422) * day);
-    const M = fixangle(N + AC.ecliptic_longitude_epoch - AC.ecliptic_longitude_perigee);
-
-    let Ec = kepler(M, AC.eccentricity);
-    Ec = Math.sqrt((1 + AC.eccentricity) / (1 - AC.eccentricity)) * Math.tan(Ec/2.0);
-    Ec = 2 * todeg(Math.atan(Ec));
-    
-    const lambda_sun = fixangle(Ec + AC.ecliptic_longitude_perigee);
-    const F = ((1 + AC.eccentricity * Math.cos(torad(Ec))) / (1 - AC.eccentricity**2))
-    const sun_dist = AC.sun_smaxis / F;
-    const sun_angular_diameter = F * AC.sun_angular_size_smaxis;
-    
-    const moon_longitude = fixangle(13.1763966 * day + AC.moon_mean_longitude_epoch);
-    const MM = fixangle(moon_longitude - 0.1114041 * day - AC.moon_mean_perigee_epoch);
-    const evection = 1.2739 * Math.sin(torad(2*(moon_longitude - lambda_sun) - MM));
-    const annual_eq = 0.1858 * Math.sin(torad(M));
-    const A3 = 0.37 * Math.sin(torad(M));
-    const MmP = MM + evection - annual_eq - A3;
-    const mEc = 6.2886 * Math.sin(torad(MmP));
-    const A4 = 0.214 * Math.sin(torad(2 * MmP));
-    const lP = moon_longitude + evection + mEc - annual_eq + A4;
-    const variation = 0.6583 * Math.sin(torad(2*(lP - lambda_sun)));
-    const lPP = lP + variation;
-  
-    const moon_age = lPP - lambda_sun;
-    const moon_phase = (1 - Math.cos(torad(moon_age))) / 2.0;
-    const moon_dist = (AC.moon_smaxis * (1 - AC.moon_eccentricity**2)) / (1 + AC.moon_eccentricity * Math.cos(torad(MmP + mEc)))
-    const moon_diam_frac = moon_dist / AC.moon_smaxis;
-    const moon_angular_diameter = AC.moon_angular_size / moon_diam_frac;
-  
-    const res : MoonData = {
-      phase: fixangle(moon_age) / 360.0,
-      illuminated: moon_phase,
-      age: AC.synodic_month * fixangle(moon_age) / 360.0,
-      distance: moon_dist,
-      angular_diameter: moon_angular_diameter,
-      sun_distance: sun_dist,
-      sun_angular_diameter: sun_angular_diameter,
-    }
-  
-    setMoonPhaseText(printString(res.phase));
-    setTextRes(res);
+    setTimeout(() => setMoonData(result), 300);
+    setTimeout(() => setMoonPhaseText(convertPhaseString(result.phase)), 300);
   }
 
-  const [startDate, setStartDate] = useState('');
 
-  function handleClicks() {
-    if (startDate === '') { return; }
+  function handleInputPhaseChange() {
+    if (inputDate === '') { 
+      clearMoonData();
+      setMoonPhaseText('ERROR: EMPTY INPUT DATE');
+      return; 
+    }
 
-    const newDate = new Date(startDate + 'T20:00Z');
+    const newDate = new Date(inputDate + 'T20:00Z');
     setDisplayDate(newDate);
-    displayPhase(getJD(newDate));
+    handlePhaseChange();
   }
 
-  function printString(res: number) {
+  function convertPhaseString(res: number) {
     let returnStr = '';
-    let prev = moonPhases[0].illuminated;
+    let prev = MP[0].illuminated;
 
-    for (const { phaseText, illuminated } of moonPhases) {
+    for (const { phaseText, illuminated } of MP) {
       returnStr = phaseText;
 
       if (res > prev && res < illuminated) {
@@ -148,36 +62,48 @@ export default function Moon() {
     return returnStr;
   }
 
+  function clearMoonData() {
+    setDisplayDate(startDate);
+    setMoonPhaseText('');
+    setMoonData(EMD);
+  }
+
 
   return (
-    <div className="w-1/2 h-1/2">
-      <div>
-        <div className="text-center">Date: {displayDate.toDateString()}</div>
-
-        <div className="text-center my-4">
-        <button className="py-2 px-4 bg-slate-500" onClick={() => displayPhase(getJD(getDate()))}>Phase</button>
-        </div>
-
+    <div className="desktop:w-1/2 w-[90%] h-1/4 my-16">
+      <div className="grid grid-cols-2 gap-4 mb-4 text-center">
         <div>
-          <input type="date" onChange={(event) => setStartDate(event.target.value)}/>
-          <button onClick={handleClicks}>Click me with date</button>
-          <div>{displayDate.toDateString()}</div>
-        </div>
-        
+          <p>{startDate.toDateString()}</p>
 
-        <div className="bg-slate-400 text-center">{moonPhaseText}</div>
-        {
-          Object.keys(textRes).map((item, index) => {
-            return(
-              <div key={index}>
-                <div>{item}: {textRes[item]}</div>
-              </div>
-            )
-          })
-        }
+          <div className="text-center my-4">
+            <button className="py-2 px-4 bg-slate-500 text-sm" onClick={(e) => handlePhaseChange(e, startDate)}>{`Today's Phase`}</button>
+          </div>
+        </div>
+
+
+        <div className="flex flex-col">
+          <input className="mb-4" type="date" onChange={(event) => setInputDate(event.target.value)}/>
+          <button className="py-2 px-4 bg-slate-500 text-sm" onClick={handleInputPhaseChange}>Calculate Phase</button>
+        </div>
       </div>
 
-      
+
+      <div>
+        { 
+          moonPhaseText !== 'ERROR: EMPTY INPUT DATE' && <p className="text-center mb-2">{displayDate.toDateString()}</p>
+        }
+
+        <div className="bg-slate-400 text-center">{moonPhaseText}</div>
+          {
+            Object.keys(moonData).map((item, index) => {
+              return(
+                <div key={index}>
+                  <div>{item}: {moonData[item]}</div>
+                </div>
+              )
+            })
+          }
+        </div>
     </div>
   )
 }

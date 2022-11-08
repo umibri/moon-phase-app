@@ -27,7 +27,7 @@ export const PrecisionConstants = {
   NEXTNEW: 4 / 4.0,
 } as const;
 
-const MoonPhases = [
+export const MoonPhases = [
   {
     phaseText: 'New Moon',
     illuminated: PrecisionConstants.NEW + PrecisionConstants.PRECISION,
@@ -65,3 +65,13 @@ const MoonPhases = [
     illuminated: PrecisionConstants.NEXTNEW + PrecisionConstants.PRECISION,
   }
 ] as const;
+
+export const EmptyMoonData = {
+  phase: 0,
+  illuminated: 0,
+  age: 0,
+  distance: 0,
+  angular_diameter: 0,
+  sun_distance: 0,
+  sun_angular_diameter: 0,
+} as const;
