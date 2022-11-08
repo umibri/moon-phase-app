@@ -1,9 +1,9 @@
 import type { NextPage } from 'next'
 import dynamic from 'next/dynamic'
 import Header from '@components/Header'
-import Moon from '@components/Moon'
+import MoonCalculator from '@components/MoonCalculator'
 
-const ThreeStars = dynamic(() => import('@components/ThreeStars'), {
+const MoonScene = dynamic(() => import('@components/Three/MoonScene'), {
   ssr: false,
 });
 
@@ -12,10 +12,12 @@ const Home: NextPage = () => {
     <div className="bg-zinc-900">
       <Header />
       
-      <div className="w-screen h-screen flex flex-col justify-center items-center">
-        <ThreeStars />
-        <Moon />
-      </div>
+
+        <div className="w-screen h-screen flex flex-col justify-center items-center">
+          <MoonScene />
+          <MoonCalculator />
+        </div>
+      
     </div>
   )
 }

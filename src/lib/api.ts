@@ -1,3 +1,4 @@
+
 export const getJD = (date? : Date) => {
   const currDate = typeof date !== 'undefined' ? date : new Date();
   const currTime = currDate.getTime();
@@ -8,5 +9,5 @@ export const getJD = (date? : Date) => {
 export const getDate = () => {
   const date = new Date();
 
-  return date.toDateString();
+  return date;
 }
